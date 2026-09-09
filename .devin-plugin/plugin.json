@@ -1,0 +1,15 @@
+{
+  "name": "apify",
+  "version": "1.0.0",
+  "description": "Run ready-made Actors from Apify, the largest marketplace of tools for AI, or build and publish your own.",
+  "author": {
+    "name": "Apify",
+    "email": "support@apify.com"
+  },
+  "homepage": "https://apify.com",
+  "repository": "https://github.com/apify/apify-devin-plugin",
+  "license": "Apache-2.0",
+  "keywords": ["apify", "web-scraping", "actors", "mcp", "automation"],
+  "skills": "skills",
+  "mcpServers": ".mcp.json"
+}
