@@ -11,7 +11,7 @@ This plugin ships Apify skills (`apify-actor-development`, `apify-actorization`,
 | Wants to add Apify to an existing JS/Python/other app | **Route 3** — invoke the `apify-sdk-integration` skill | **`apify-client` SDK over HTTPS** — neither MCP nor CLI needed |
 | Ambiguous | Ask: "Do you want to (a) use existing scrapers and tools from Apify, (b) build and deploy a custom Actor, or (c) integrate Apify into an existing application?" | Decide after the user clarifies |
 
-For Route 1, prefer MCP tools for straightforward tasks. Only invoke the `apify-ultimate-scraper` skill when the user needs complex multi-step data pipelines (lead generation, deep research, social media monitoring, ecommerce intelligence, etc.).
+For Route 1, prefer MCP tools for straightforward tasks. Only invoke the `apify-ultimate-scraper` skill when the user needs complex multi-step data pipelines across multiple Actors (lead generation, deep research, social media monitoring, ecommerce intelligence, etc.). That skill is CLI-only and requires the CLI regardless of MCP availability.
 
 Do **not**:
 
@@ -25,7 +25,7 @@ If the user invokes an Apify skill explicitly, still apply this routing so the m
 
 Route 1 (use existing Actors: search, fetch details, run, get results, look up docs) is exposed through **two interchangeable transports**: the Apify MCP server and the Apify CLI. Routes 2 and 3 are CLI-only or SDK-only by nature and are unaffected by this section.
 
-Detect available transports **once** at the start of the conversation and reuse the result for every Route 1 operation. Skills downstream (`apify-ultimate-scraper`, etc.) provide both MCP and CLI variants per step — they will not re-detect.
+Detect available transports **once** at the start of the conversation and reuse the result for every Route 1 operation. `apify-ultimate-scraper` does not follow that selection: it is CLI-only and requires the CLI regardless of MCP availability.
 
 1. **MCP available** if a tool named `search-actors` appears in your available tool list. (Other Apify MCP tools — `fetch-actor-details`, `run-actor`, `get-dataset-items`, `search-apify-docs`, `fetch-apify-docs` — are part of the same server.)
 2. **CLI available** if `apify --help` exits 0 in the shell.
@@ -48,10 +48,12 @@ State the chosen transport once when you start a Route 1 task ("Using MCP for th
 ## Authentication
 
 - **Route 1 (MCP):** OAuth. No setup needed. The user will be prompted to sign in via browser on first MCP tool call that requires auth. Do not ask for an API token.
-- **Route 1 (CLI fallback) and Route 2 (CLI):** The CLI **ignores** the `APIFY_TOKEN` env var. Run `apify login --token TOKEN` once. Credentials are stored in `~/.apify/auth.json` and reused automatically. Token from: https://console.apify.com/settings/integrations
+- **Route 1 (CLI fallback) and Route 2 (CLI):** On CLI **v1.10.0 and earlier**, the CLI **ignores** the `APIFY_TOKEN` env var. Run `apify login --token TOKEN` once. Credentials are stored in `~/.apify/auth.json` and reused automatically. From CLI **v1.10.1**, `APIFY_TOKEN` takes precedence over the stored login. Token from: https://console.apify.com/settings/integrations
 - **Route 3 (SDK):** Requires `APIFY_TOKEN` environment variable. Direct the user to **Console > Settings > Integrations** at https://console.apify.com/settings/integrations. Sign-up: https://console.apify.com/sign-up (free, no credit card).
 
 ### Apify CLI instructions
+
+Commands run under an agent are non-interactive. Any command that can prompt needs its non-interactive flag or argument. This is not limited to `apify init` — other commands ask for a yes/no confirm and will hang the same way without their flag.
 
 - Before using the CLI, check that it is installed: `apify --help`
 - If installed, check that it is logged in (`apify info 2>&1` — do not pipe to `/dev/null`, you need to see errors).
