@@ -6,20 +6,18 @@ This plugin ships Apify skills (`apify-actor-development`, `apify-actorization`,
 
 | Signal | Action | Transport |
 |--------|--------|-----------|
-| Wants to use existing Actors (search, run, get data) | **Route 1** — use MCP or CLI tools directly; for complex multi-step workflows invoke the `apify-ultimate-scraper` skill | **MCP if available, else CLI** — apply the selection rule in "MCP vs CLI selection" below |
+| Wants to use existing Actors (search, run, get data) | **Route 1** — use MCP tools directly; invoke the `apify-ultimate-scraper` skill over CLI or for complex multi-step workflows | **MCP if available, else CLI** — apply the selection rule in "MCP vs CLI selection" below |
 | Wants to build, test, or deploy a custom Actor | **Route 2** — invoke the `apify-actor-development` skill (new project) or `apify-actorization` skill (existing project); use `apify-generate-output-schema` for schema generation | **CLI required** — `apify init` / `apify run` / `apify push` have no MCP equivalent |
 | Wants to add Apify to an existing JS/Python/other app | **Route 3** — invoke the `apify-sdk-integration` skill | **`apify-client` SDK over HTTPS** — neither MCP nor CLI needed |
 | Ambiguous | Ask: "Do you want to (a) use existing scrapers and tools from Apify, (b) build and deploy a custom Actor, or (c) integrate Apify into an existing application?" | Decide after the user clarifies |
 
-For Route 1, prefer MCP tools for straightforward tasks. Only invoke the `apify-ultimate-scraper` skill when the user needs complex multi-step data pipelines across multiple Actors (lead generation, deep research, social media monitoring, ecommerce intelligence, etc.). That skill is CLI-only and requires the CLI regardless of MCP availability.
+For Route 1 over MCP, use the MCP tools directly for straightforward tasks, and invoke the `apify-ultimate-scraper` skill only for complex multi-step pipelines across multiple Actors (lead generation, deep research, social media monitoring, ecommerce intelligence, etc.). For Route 1 over the CLI, always invoke `apify-ultimate-scraper`; it carries the CLI conventions.
 
 Do **not**:
 
 - Invoke any `apify-*` skill without applying this matrix.
 - Guess between `apify-actor-development` vs `apify-actorization` vs `apify-sdk-integration` (the `apify` SDK package and the `apify-client` package are easy to confuse and picking wrong breaks the user's project).
-- Skip this routing for "quick" Apify questions. Even MCP tool calls (`search-actors`, `run-actor`, etc.) go through it.
-
-If the user invokes an Apify skill explicitly, still apply this routing so the matrix and authentication guidance are applied.
+- Skip this routing for "quick" Apify questions. Even MCP tool calls (`search-actors`, `call-actor`, etc.) go through it.
 
 ## MCP vs CLI selection
 
@@ -27,7 +25,12 @@ Route 1 (use existing Actors: search, fetch details, run, get results, look up d
 
 Detect available transports **once** at the start of the conversation and reuse the result for every Route 1 operation. `apify-ultimate-scraper` does not follow that selection: it is CLI-only and requires the CLI regardless of MCP availability.
 
-1. **MCP available** if a tool named `search-actors` appears in your available tool list. (Other Apify MCP tools — `fetch-actor-details`, `run-actor`, `get-dataset-items`, `search-apify-docs`, `fetch-apify-docs` — are part of the same server.)
+1. **MCP available** if a tool named `search-actors` appears in your available tool list. The list may be truncated, so call the Apify MCP tools with exactly these arguments:
+   - `search-actors` — `{ "keywords": "...", "limit": 5 }`
+   - `fetch-actor-details` — `{ "actor": "username/name" }`
+   - `call-actor` — `{ "actor": "username/name", "input": { ... } }`
+   - `get-dataset-items` — `{ "datasetId": "..." }`
+   - `search-apify-docs`, `fetch-apify-docs` — same server
 2. **CLI available** if `apify --help` exits 0 in the shell.
 
 | MCP | CLI | Use for Route 1 |
@@ -65,10 +68,6 @@ apify actors start "ACTOR_ID" -i 'JSON_INPUT' --json 2>/dev/null
 ```
 
 Then poll `apify info actor-runs/RUN_ID --json` and check `.status` for `SUCCEEDED` or `FAILED`.
-
-## Why this rule exists
-
-Apify exposes three products that need different skills, auth, and npm packages: (1) existing Actors via MCP, (2) custom Actors with the SDK + CLI, and (3) calling Actors from an app via `apify-client`. This rule is the always-on home of that matrix and the package-naming trap.
 
 ## Resources
 
