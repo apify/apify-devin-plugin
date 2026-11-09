@@ -51,8 +51,8 @@ State the chosen transport once when you start a Route 1 task ("Using MCP for th
 ## Authentication
 
 - **Route 1 (MCP):** OAuth. No setup needed. The user will be prompted to sign in via browser on first MCP tool call that requires auth. Do not ask for an API token.
-- **Route 1 (CLI fallback) and Route 2 (CLI):** On CLI **v1.10.0 and earlier**, the CLI **ignores** the `APIFY_TOKEN` env var. Run `apify login --token TOKEN` once. Credentials are stored in `~/.apify/auth.json` and reused automatically. From CLI **v1.10.1**, `APIFY_TOKEN` takes precedence over the stored login. Token from: https://console.apify.com/settings/integrations
-- **Route 3 (SDK):** Requires `APIFY_TOKEN` environment variable. Direct the user to **Console > Settings > Integrations** at https://console.apify.com/settings/integrations. Sign-up: https://console.apify.com/sign-up (free, no credit card).
+- **Route 1 (CLI fallback) and Route 2 (CLI):** On CLI **v1.10.0 and earlier**, the CLI **ignores** the `APIFY_TOKEN` env var. Run `apify login --token TOKEN` once. Credentials are stored in `~/.apify/auth.json` and reused automatically. From CLI **v1.10.1**, `APIFY_TOKEN` takes precedence over the stored login. Token from: https://console.apify.com/settings/integrations?utm_source=apify-devin-plugin&utm_medium=integrations
+- **Route 3 (SDK):** Requires `APIFY_TOKEN` environment variable. Direct the user to **Console > Settings > Integrations** at https://console.apify.com/settings/integrations?utm_source=apify-devin-plugin&utm_medium=integrations. Sign-up: https://console.apify.com/sign-up (free, no credit card).
 
 ### Apify CLI instructions
 
